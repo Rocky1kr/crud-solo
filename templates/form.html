@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}{{ '글 수정' if mode == 'edit' else '글쓰기' }} - 게시판{% endblock %}
+{% block head %}
+<style>
+  h1 { margin: 0 0 24px; font-size: 30px; font-weight: 800; letter-spacing: -0.03em; }
+
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 28px; }
+  label { display: block; font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+  .field + .field { margin-top: 20px; }
+
+  input[type=text], textarea {
+    width: 100%; padding: 12px 14px;
+    border: 1px solid var(--line); border-radius: 10px;
+    background: var(--bg); color: var(--ink);
+    font: inherit; font-size: 16px;
+  }
+  input[type=text]:focus, textarea:focus { outline: none; border-color: var(--accent); background: var(--surface); }
+  input[type=text] { font-size: 18px; font-weight: 700; }
+  textarea { min-height: 280px; resize: vertical; line-height: 1.7; }
+  .hint { margin-top: 6px; font-size: 13px; color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
+
+  .error {
+    margin-bottom: 20px; padding: 12px 16px; border-radius: 10px;
+    border: 1px solid var(--danger); color: var(--danger);
+    background: color-mix(in srgb, var(--danger) 8%, var(--surface));
+    font-size: 15px; font-weight: 600;
+  }
+
+  .actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 24px; }
+
+  @media (max-width: 560px) {
+    .card { padding: 20px; }
+    h1 { font-size: 24px; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>{{ '글 수정' if mode == 'edit' else '새 글 쓰기' }}</h1>
+
+{% if error %}<div class="error" role="alert">{{ error }}</div>{% endif %}
+
+<form class="card"
+      action="{{ '/posts/%d/update' % post.id if mode == 'edit' else '/posts/create' }}"
+      method="post">
+  <div class="field">
+    <label for="title">제목</label>
+    <input id="title" type="text" name="title" value="{{ post.title }}"
+           maxlength="100" required autofocus>
+    <div class="hint"><span id="count">{{ post.title|length }}</span> / 100</div>
+  </div>
+  <div class="field">
+    <label for="content">내용</label>
+    <textarea id="content" name="content" required>{{ post.content }}</textarea>
+  </div>
+  <div class="actions">
+    <a class="btn" href="{{ '/posts/%d' % post.id if mode == 'edit' else '/posts' }}">취소</a>
+    <button class="btn btn-primary" type="submit">{{ '수정 완료' if mode == 'edit' else '등록' }}</button>
+  </div>
+</form>
+
+<script>
+  const t = document.getElementById('title');
+  const c = document.getElementById('count');
+  t.addEventListener('input', () => { c.textContent = t.value.length; });
+</script>
+{% endblock %}

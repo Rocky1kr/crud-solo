@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block head %}
+<style>
+  .head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+  .head h1 { margin: 0; font-size: 32px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.2; }
+  .head h1 small { font-size: 16px; font-weight: 600; color: var(--muted); margin-left: 6px; letter-spacing: 0; }
+
+  .search { display: flex; gap: 8px; }
+  .search input {
+    height: 40px; width: 220px; padding: 0 14px;
+    border: 1px solid var(--line); border-radius: 10px;
+    background: var(--surface); color: var(--ink); font: inherit; font-size: 15px;
+  }
+  .search input:focus { outline: none; border-color: var(--accent); }
+
+  .board { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+  .row {
+    display: grid; grid-template-columns: 1fr auto; gap: 4px 20px;
+    padding: 18px 22px; text-decoration: none;
+    border-top: 1px solid var(--line);
+  }
+  .row:first-child { border-top: 0; }
+  .row:hover { background: color-mix(in srgb, var(--accent) 6%, var(--surface)); }
+  .row-title { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
+  .row-excerpt { grid-column: 1; color: var(--muted); font-size: 14px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .row-date { grid-column: 2; grid-row: 1; color: var(--muted); font-size: 13px; white-space: nowrap; align-self: center; font-variant-numeric: tabular-nums; }
+
+  .empty { padding: 56px 24px; text-align: center; }
+  .empty p { margin: 0 0 16px; }
+
+  @media (max-width: 560px) {
+    .head h1 { font-size: 26px; }
+    .search { width: 100%; }
+    .search input { flex: 1; width: auto; }
+    .row { grid-template-columns: 1fr; padding: 16px 18px; }
+    .row-date { grid-column: 1; grid-row: auto; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="head">
+  <h1>전체 글<small>{{ total }}</small></h1>
+  <form class="search" action="/posts" method="get" role="search">
+    <input type="search" name="q" value="{{ q }}" placeholder="제목, 내용 검색" aria-label="검색어">
+    <button class="btn" type="submit">검색</button>
+  </form>
+</div>
+
+{% if q %}
+<p class="muted">‘{{ q }}’ 검색 결과 {{ posts|length }}건 · <a href="/posts">검색 지우기</a></p>
+{% endif %}
+
+<div class="board">
+  {% for post in posts %}
+  <a class="row" href="/posts/{{ post.id }}">
+    <span class="row-title">{{ post.title }}</span>
+    <span class="row-date">{{ post.created_at | dt }}</span>
+    <span class="row-excerpt">{{ post.content }}</span>
+  </a>
+  {% else %}
+  <div class="empty">
+    {% if q %}
+      <p class="muted">‘{{ q }}’가 들어간 글이 없어요.</p>
+      <a class="btn" href="/posts">전체 글 보기</a>
+    {% else %}
+      <p class="muted">아직 글이 없어요. 첫 글을 남겨 보세요.</p>
+      <a class="btn btn-primary" href="/posts/new">글쓰기</a>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
